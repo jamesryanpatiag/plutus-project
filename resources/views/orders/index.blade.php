@@ -44,30 +44,30 @@
             </thead>
             <tbody>
                 @foreach ($orders as $order)
+                @php 
+                    switch($order->orderStatus->name) {
+                        case "order.Not_Paid":
+                        case "order.Void":
+                            $class = "danger";
+                        break;
+                        case "order.Partial":
+                            $class = "warning";
+                        break;
+                        case "order.Paid":
+                            $class = "success";
+                        break;
+                        case "order.Change":
+                            $class = "info";
+                        break;
+
+                    }
+                @endphp
                 <tr>
                     <td>{{$order->id}}</td>
                     <td>{{$order->getCustomerName()}}</td>
                     <td>{{ config('settings.currency_symbol') }} {{$order->formattedTotal()}}</td>
                     <td>{{ config('settings.currency_symbol') }} {{$order->formattedReceivedAmount()}}</td>
                     <td>
-                        @php 
-                            switch($order->orderStatus->name) {
-                                case "order.Not_Paid":
-                                case "order.Void":
-                                    $class = "danger";
-                                break;
-                                case "order.Partial":
-                                    $class = "warning";
-                                break;
-                                case "order.Paid":
-                                    $class = "success";
-                                break;
-                                case "order.Change":
-                                    $class = "info";
-                                break;
-
-                            }
-                        @endphp
                         <span class="badge badge-{{ $class }}">{{ __($order->orderStatus->name) }}</span>
                     </td>
                     <td>{{config('settings.currency_symbol')}} {{number_format($order->total() - $order->receivedAmount(), 2)}}</td>
@@ -81,6 +81,8 @@
                             data-customer-name="{{ $order->getCustomerName() }}"
                             data-total="{{ $order->total() }}"
                             data-received="{{ $order->receivedAmount() }}"
+                            data-status="{{__($order->orderStatus->name)}}"
+                            data-btn-class="{{ $class }}"
                             data-items="{{ json_encode($order->items) }}"
                             data-created-at="{{ $order->created_at }}"
                             data-payment="{{ isset($order->payments) && count($order->payments) > 0 ? $order->payments[0]->amount : 0 }}">
@@ -149,10 +151,11 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <!-- Placeholder for dynamic content -->
+            <div class="modal-body invoice">
+                
             </div>
             <div class="modal-footer">
+            <button class="btn btn-info" onclick="printInvoice()">Print Invoice</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -166,6 +169,18 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ asset('plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 <script>
+
+    function printInvoice() {
+        const originalBodyContent = $('body').html(); // Store the entire body content
+        const modalContent = $('.invoice').html(); // Get the modal's inner HTML
+
+        $('body').empty().append(modalContent); // Replace body with modal content
+
+        window.print(); // Trigger print
+
+        $('body').empty().append(originalBodyContent); // Restore original content
+        location.reload();
+    }
     // Use event delegation to bind to the document for dynamically generated elements
     $(document).on('click', '.btnShowInvoice', function(event) {
         console.log("Modal show event triggered!");
@@ -178,6 +193,8 @@
         var receivedAmount = button.data('received');
         var payment = button.data('payment');
         var createdAt = button.data('created-at');
+        var status = button.data('status');
+        var btnClass = button.data('btn-class');
         var items = button.data('items'); // Ensure this is correctly passed as a JSON
 
         // Log the data to ensure it's being captured correctly
@@ -187,7 +204,8 @@
             totalAmount,
             receivedAmount,
             createdAt,
-            items
+            items,
+            status
         });
 
         // Open the modal
@@ -212,25 +230,13 @@
         `;
             });
         }
-
         // Update the modal body content
         modalBody.html(`
     <div class="card">
         <div class="card-header">
             Invoice <strong>${createdAt.split('T')[0]}</strong>
-            <span class="float-right"> <strong>Status:</strong> ${
-
-                        receivedAmount == 0?
-                            '<span class="badge badge-danger">{{ __('order.Not_Paid') }}</span>':
-                        receivedAmount < totalAmount ?
-                            '<span class="badge badge-warning">{{ __('order.Partial') }}</span>':
-                        receivedAmount == totalAmount?
-                            '<span class="badge badge-success">{{ __('order.Paid') }}</span>':
-                        receivedAmount > totalAmount?
-                            '<span class="badge badge-info">{{ __('order.Change') }}</span>':''
-            }</span>
-
-
+            <span class="float-right"> <strong>Status:</strong> 
+            <span class="badge badge-${btnClass}">${status}</span>
         </div>
         <div class="card-body">
             <div class="row mb-4">
