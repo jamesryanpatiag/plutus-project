@@ -35,19 +35,6 @@
             </div>
 
             <div class="form-group">
-                <label for="image">{{ __('product.Image') }}</label>
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" name="image" id="image">
-                    <label class="custom-file-label" for="image">{{ __('product.Choose_file') }}</label>
-                </div>
-                @error('image')
-                <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-                @enderror
-            </div>
-
-            <div class="form-group">
                 <label for="barcode">{{ __('product.Barcode') }}</label>
                 <input type="text" name="barcode" class="form-control @error('barcode') is-invalid @enderror"
                     id="barcode" placeholder="{{ __('product.Barcode') }}" value="{{ old('barcode') }}">
@@ -93,6 +80,19 @@
                 @enderror
             </div>
 
+            <div class="form-group">
+                <label><b>Select Image:</b></label>
+                <input type="file" class="form-control" id="imgInput" name="image" accept="image/*">
+                @error('image')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+                @enderror
+            </div>
+            <div class="form-group">
+                <img src="" style="height:250px;" id="imgPreview">
+            </div>
+            
             <button class="btn btn-primary" type="submit">{{ __('common.Create') }}</button>
         </form>
     </div>
@@ -100,10 +100,19 @@
 @endsection
 
 @section('js')
-<script src="{{ asset('plugins/bs-custom-file-input/bs-custom-file-input.min.js') }}"></script>
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script>
-    $(document).ready(function () {
-        bsCustomFileInput.init();
-    });
-</script>
-@endsection
+		$("#imgInput").change(function(){
+			if (this.files && this.files[0]) {
+				var reader = new FileReader();
+				reader.onload = function (e) {
+					$('#imgPreview').attr('src', e.target.result);
+				}
+				reader.readAsDataURL(this.files[0]);
+			}
+		});
+	</script>
+@endsection 

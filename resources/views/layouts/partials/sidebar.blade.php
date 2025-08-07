@@ -60,7 +60,7 @@
                     </a>
                 </li>
                 <li class="nav-item has-treeview">
-                    <a href="{{ route('suppliers.index') }}" class="nav-link {{ activeSegment('supplier') }}">
+                    <a href="{{ route('suppliers.index') }}" class="nav-link {{ activeSegment('suppliers') }}">
                         <i class="nav-icon fas fa-users"></i>
                         <p>{{ __('Supplier') }}</p>
                     </a>

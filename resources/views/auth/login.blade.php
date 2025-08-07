@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-<p class="login-box-msg">Sign in to start your session</p>
+<p class="login-box-msg">Welcome to PLUTUS</p>
 
 <form action="{{ route('login') }}" method="post">
     @csrf
@@ -69,6 +69,6 @@
     <a href="{{ route('password.request') }}">I forgot my password</a>
 </p>
 <p class="mb-0">
-    <a href="{{ route('register')}}" class="text-center">Register a new membership</a>
+    <!-- <a href="{{ route('register')}}" class="text-center">Register a new membership</a> -->
 </p>
 @endsection

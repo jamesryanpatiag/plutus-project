@@ -19,11 +19,14 @@
 <body class="hold-transition login-page">
     <div class="login-box">
         <div class="login-logo">
-            <a href="../../index2.html">{{ config('app.name') }}</a>
+            <!-- {{ config('app.name') }} -->
         </div>
         <!-- /.login-logo -->
         <div class="card">
             <div class="card-body login-card-body">
+                <div style="text-align:center">
+                    <img src="{{ asset('/images/logo.png') }}" style="height:100px;margin:0 auto" />
+                </div>
                 @yield('content')
             </div>
             <!-- /.login-card-body -->

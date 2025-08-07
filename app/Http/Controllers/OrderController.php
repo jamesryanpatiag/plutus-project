@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Enums\OrderStatusEnum;
 use App\Models\OrderStatus;
+use App\Models\Product;
 use Log;
 
 class OrderController extends Controller
@@ -45,7 +46,6 @@ class OrderController extends Controller
 
     public function store(OrderStoreRequest $request)
     {
-        Log::info("test");
         $order = Order::create([
             'customer_id' => $request->customer_id,
             'user_id' => $request->user()->id,
@@ -120,6 +120,12 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
+        $orderItems = $order->items;
+        foreach ($orderItems as $orderItem) {
+            $product = Product::find($orderItem->product->id);
+            $product->quantity += $orderItem->quantity;
+            $product->save();
+        }
         $orderStatus = OrderStatus::where('name', OrderStatusEnum::ORDER_VOID)->first();
         $voidData = Order::find($order->id);
         $voidData->order_status_id = $orderStatus->id;

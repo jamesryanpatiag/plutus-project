@@ -8,6 +8,7 @@ use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Log;
 
 class ProductController extends Controller
 {
@@ -48,7 +49,6 @@ class ProductController extends Controller
     public function store(ProductStoreRequest $request)
     {
         $image_path = '';
-
         if ($request->hasFile('image')) {
             $image_path = $request->file('image')->store('products', 'public');
         }
