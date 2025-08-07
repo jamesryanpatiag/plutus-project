@@ -28,10 +28,11 @@ class OrderController extends Controller
             $orders = $orders->whereHas('customer', function ($query) use ($keyword) {
                 $query->where('first_name', 'like', '%'.$keyword.'%')
                     ->orWhere('last_name', 'like', '%'.$keyword.'%');
+            })->orWhereHas('orderStatus', function ($query) use ($keyword) {
+                $query->where('name', 'like', '%'.$keyword.'%');
             });
         }
         $orders = $orders->with(['items.product', 'payments', 'customer'])->latest()->paginate(10);
-
         $total = $orders->map(function ($i) {
             return $i->total();
         })->sum();
